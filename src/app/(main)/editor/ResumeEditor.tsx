@@ -25,9 +25,9 @@ export default function ResumeEditor({ resumeToEdit }: ResumeEditorProps) {
 
   const [showSmResumePreview, setShowSmResumePreview] = useState(false);
 
-  // const { isSaving, hasUnsavedChanges } = useAutoSaveResume(resumeData);
+  const { isSaving, hasUnsavedChanges } = useAutoSaveResume(resumeData);
 
-  // useUnloadWarning(hasUnsavedChanges);
+  useUnloadWarning(hasUnsavedChanges);
 
   const currentStep = searchParams.get("step") || steps[0].key;
 
@@ -79,7 +79,7 @@ export default function ResumeEditor({ resumeToEdit }: ResumeEditorProps) {
         setCurrentStep={setStep}
         showSmResumePreview={showSmResumePreview}
         setShowSmResumePreview={setShowSmResumePreview}
-        isSaving={false}
+        isSaving={isSaving}
       />
     </div>
   );
