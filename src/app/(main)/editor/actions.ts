@@ -32,7 +32,7 @@ export async function saveResume(values: ResumeValues) {
 
   let newPhotoUrl: string | undefined | null = undefined;
 
-  if (photo instanceof File) {
+  if (typeof File !== 'undefined' && photo instanceof File) {
     if (existingResume?.photoUrl) {
       await del(existingResume.photoUrl);
     }
