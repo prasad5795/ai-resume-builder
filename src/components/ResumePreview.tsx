@@ -79,7 +79,7 @@ function PersonalInfoHeader({ resumeData }: ResumeSectionProps) {
     <div className="flex items-center gap-6">
       {photoSrc && (
         <Image
-          src={photoSrc}
+          src={photoSrc as unknown as string}
           width={100}
           height={100}
           alt="Author photo"
