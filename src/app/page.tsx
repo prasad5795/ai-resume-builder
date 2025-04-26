@@ -1,5 +1,5 @@
-import logo from "@/assets/logo.png";
-import resumePreview from "@/assets/resume-preview.jpg";
+import logo from "@/assets/Perfect candidate_s cv found.svg";
+import resumePreview from "@/assets/hero_job_title.svg";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
@@ -16,9 +16,9 @@ export default function Home() {
           className="mx-auto md:ms-0"
         />
         <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
-          Create the{" "}
-          <span className="inline-block bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-transparent">
-            Perfect Resume
+          Craft your{" "}
+          <span className="bg-gradient-to-r bg-clip-text text-transparent" style={{ background: "linear-gradient(#5a38fd, #5a38fd)", backgroundClip: "text" }}>
+            ATS Friendly Resume
           </span>{" "}
           in Minutes
         </h1>
@@ -35,6 +35,7 @@ export default function Home() {
           src={resumePreview}
           alt="Resume preview"
           width={600}
+          height={500}
           className="shadow-md lg:rotate-[1.5deg]"
         />
       </div>

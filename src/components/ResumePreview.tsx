@@ -8,6 +8,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Badge } from "./ui/badge";
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { Download } from 'lucide-react';
 
 interface ResumePreviewProps {
   resumeData: ResumeValues;
@@ -72,10 +73,10 @@ export default function ResumePreview({
       ref={containerRef}
     >
       <button
-        className="absolute top-2 right-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        className="absolute top-2 right-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-2 rounded"
         onClick={handleDownloadPdf}
       >
-        Download PDF
+        <Download className="h-6 w-6" />
       </button>
       <div
         className={cn("space-y-6 p-6", !width && "invisible")}
