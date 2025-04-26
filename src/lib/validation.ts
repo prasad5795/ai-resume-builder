@@ -13,8 +13,9 @@ export const personalInfoSchema = z.object({
   photo: z
     .custom<File | undefined>()
     .refine(
-      (file) =>
-        !file || (file instanceof File && file.type.startsWith("image/")),
+      (file) => {
+        return !file || file.type.startsWith("image/")
+      },
       "Must be an image file",
     )
     .refine(

@@ -6,6 +6,8 @@ import { formatDate } from "date-fns";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import { Badge } from "./ui/badge";
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 interface ResumePreviewProps {
   resumeData: ResumeValues;
@@ -22,19 +24,61 @@ export default function ResumePreview({
 
   const { width } = useDimensions(containerRef);
 
+  const handleDownloadPdf = () => {
+    const element = document.getElementById('resumePreviewContent');
+    if (!element) return;
+
+    html2canvas(element, {
+      scale: 4,
+      useCORS: true,
+    }).then((canvas) => {
+      const pdf = new jsPDF({
+        unit: 'px',
+        format: 'a4',
+        orientation: 'portrait',
+      });
+
+      const image = canvas.toDataURL('image/jpeg');
+
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      const imageWidth = pageWidth - 1;
+      const imageHeight = (canvas.height * imageWidth) / canvas.width;
+
+      let heightLeft = imageHeight;
+      let position = 0;
+
+      pdf.addImage(image, 'JPEG', 0.5, position, imageWidth, imageHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imageHeight;
+        pdf.addPage();
+        pdf.addImage(image, 'JPEG', 0.5, position, imageWidth, imageHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save('resume.pdf');
+    });
+  };
+
   return (
     <div
       className={cn(
-        "aspect-[210/297] h-fit w-full bg-white text-black",
+        "aspect-[210/297] h-fit w-full bg-white text-black relative",
         className,
       )}
       ref={containerRef}
     >
+      <button
+        className="absolute top-2 right-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        onClick={handleDownloadPdf}
+      >
+        Download PDF
+      </button>
       <div
         className={cn("space-y-6 p-6", !width && "invisible")}
-        style={{
-          zoom: (1 / 794) * width,
-        }}
         ref={contentRef}
         id="resumePreviewContent"
       >
@@ -65,6 +109,7 @@ function PersonalInfoHeader({ resumeData }: ResumeSectionProps) {
     colorHex,
     borderStyle,
   } = resumeData;
+  console.log("🚀 ~ PersonalInfoHeader ~ resumeData:", resumeData)
 
   const [photoSrc, setPhotoSrc] = useState(typeof File !== 'undefined' && photo instanceof File ? "" : photo);
 
@@ -147,7 +192,7 @@ function SummarySection({ resumeData }: ResumeSectionProps) {
         >
           Professional profile
         </p>
-        <div className="whitespace-pre-line text-sm">{summary}</div>
+        <div className="text-sm">{summary}</div>
       </div>
     </>
   );
@@ -196,7 +241,7 @@ function WorkExperienceSection({ resumeData }: ResumeSectionProps) {
               )}
             </div>
             <p className="text-xs font-semibold">{exp.company}</p>
-            <div className="whitespace-pre-line text-xs">{exp.description}</div>
+            <div className="whitespace-pre-line text-sm">{exp.description}</div>
           </div>
         ))}
       </div>
@@ -280,9 +325,8 @@ function SkillsSection({ resumeData }: ResumeSectionProps) {
           {skills.map((skill, index) => (
             <Badge
               key={index}
-              className="rounded-md bg-black text-white hover:bg-black"
+              className="rounded-md bg-white text-black text-xs border-2"
               style={{
-                backgroundColor: colorHex,
                 borderRadius:
                   borderStyle === BorderStyles.SQUARE
                     ? "0px"
