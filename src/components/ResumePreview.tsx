@@ -109,7 +109,6 @@ function PersonalInfoHeader({ resumeData }: ResumeSectionProps) {
     colorHex,
     borderStyle,
   } = resumeData;
-  console.log("🚀 ~ PersonalInfoHeader ~ resumeData:", resumeData)
 
   const [photoSrc, setPhotoSrc] = useState(typeof File !== 'undefined' && photo instanceof File ? "" : photo);
 
