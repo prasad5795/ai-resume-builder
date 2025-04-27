@@ -7,15 +7,12 @@ interface ATSResumeProps {
 }
 
 const ATSResumeShowcase: React.FC<ATSResumeProps> = ({ resumeContent }) => {
-    console.log("🚀 ~ resumeContent:", resumeContent)
     return (
-        // <div className="prose w-full p-6 bg-white shadow-lg rounded-lg">
         <ReactMarkdown
             remarkPlugins={[remarkGfm]}
         >
             {resumeContent}
         </ReactMarkdown>
-        // </div>
     );
 };
 

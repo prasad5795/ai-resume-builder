@@ -1,8 +1,7 @@
 import logo from "@/assets/Perfect candidate_s cv found.svg";
-import resumePreview from "@/assets/hero_job_title.svg";
-import { Button } from "@/components/ui/button";
+// import resumePreview from "@/assets/hero_job_title.svg";
+import resumePreview from "@/assets/1.svg";
 import Image from "next/image";
-import Link from "next/link";
 import { ResumeCreationSelector } from "./selection/ResumeCreationSelector";
 
 export default function Home() {
@@ -36,7 +35,7 @@ export default function Home() {
           alt="Resume preview"
           width={600}
           height={500}
-          className="shadow-md lg:rotate-[1.5deg]"
+          className="lg:rotate-[1.5deg]"
         />
       </div>
     </main>

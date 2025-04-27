@@ -234,7 +234,6 @@ export class ATSResumeGenerator {
                 resumeJSON: JSON.stringify(resumeData, null, 2),
                 jobDescription,
             });
-            console.log("🚀 ~ ATSResumeGenerator ~ analyzeKeywordMatch ~ result:", result)
 
             // Clean and parse the result
             const cleanedResult = result.text
