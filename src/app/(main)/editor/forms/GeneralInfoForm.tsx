@@ -27,7 +27,8 @@ export default function GeneralInfoForm({
   });
 
   const onSubmit = (values: GeneralInfoValues) => {
-    setResumeData(prevData => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setResumeData((prevData: any) => ({
       ...prevData,
       title: values.title,
       description: values.description

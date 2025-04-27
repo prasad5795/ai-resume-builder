@@ -61,7 +61,8 @@ export default function WorkExperienceForm({
   );
 
   const onSubmit = (values: WorkExperienceValues) => {
-    setResumeData(prevData => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setResumeData((prevData: any) => ({
       ...prevData,
       workExperiences: values.workExperiences?.filter((exp) => exp !== undefined) || [],
     }));

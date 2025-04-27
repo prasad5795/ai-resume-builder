@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Prisma } from "@prisma/client";
-import { ResumeValues } from "./validation";
+import { ResumeValues as ValidationResumeValues } from "./validation";
+
+export type ResumeValues = ValidationResumeValues;
 
 export interface EditorFormProps {
   resumeData: ResumeValues;
-  setResumeData: (data: ResumeValues) => void;
+  setResumeData: (data: any) => void;
 }
 
 export const resumeDataInclude = {

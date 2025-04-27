@@ -1,11 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { Dispatch, useState } from 'react';
 import { Upload, File, AlertCircle, X } from 'lucide-react';
 
 interface PDFUploadProps {
     onFileSelect: (file: File | null) => void;
     isProcessing?: boolean;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setatsResume: Dispatch<any>
 }
 
 export function PDFUpload({ onFileSelect, isProcessing = false, setatsResume }: PDFUploadProps) {

@@ -1,3 +1,4 @@
+import { ResumeValues } from "@/lib/validation";
 import {
   Form,
   FormControl,
@@ -26,10 +27,14 @@ export default function SummaryForm({
   });
 
   const onSubmit = (values: SummaryValues) => {
-    setResumeData(prevData => ({
-      ...prevData,
-      ...values
-    }));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setResumeData((prevData: any) => {
+      const newResumeData: ResumeValues = {
+        ...prevData,
+        summary: values.summary,
+      };
+      return newResumeData;
+    });
   };
 
   return (

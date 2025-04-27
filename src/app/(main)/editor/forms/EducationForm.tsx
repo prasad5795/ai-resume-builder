@@ -58,7 +58,8 @@ export default function EducationForm({
   );
 
   const onSubmit = (values: EducationValues) => {
-    setResumeData(prevData => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setResumeData((prevData: any) => ({
       ...prevData,
       educations: values.educations?.filter((edu) => edu !== undefined) || [],
     }));

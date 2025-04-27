@@ -1,22 +1,21 @@
 'use client';
 
-import { useState } from 'react';
-import { PDFUpload } from '@/components/PDFUpload';
-import { Resume } from '../../types/resume';
 import { ATSResumeBuilder } from '@/components/ATSResumeBuilder';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ATSResumeShowcase from '@/components/ATSResumeShowcase';
+import { PDFUpload } from '@/components/PDFUpload';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { useState } from 'react';
 
 export default function ResumeUploadPage() {
-    const [resume, setResume] = useState<Resume | null>(null);
     const [isProcessing, setIsProcessing] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [parsedPDF, setparsedPDF] = useState(null)
-    const [fileName, setfileName] = useState<string | null>(null)
-    const [atsResume, setatsResume] = useState()
+    const [, setfileName] = useState<string | null>(null)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [atsResume, setatsResume] = useState<any>()
 
-    const handleFileSelect = async (file: File) => {
+    const handleFileSelect = async (file: File | null) => {
         if (file) {
             setIsProcessing(true);
             setError(null);

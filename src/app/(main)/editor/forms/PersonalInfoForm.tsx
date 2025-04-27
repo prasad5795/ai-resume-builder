@@ -36,7 +36,8 @@ export default function PersonalInfoForm({
   const photoInputRef = useRef<HTMLInputElement>(null);
 
   const onSubmit = (values: PersonalInfoValues) => {
-    setResumeData(prevData => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setResumeData((prevData: any) => ({
       ...prevData,
       firstName: values.firstName,
       lastName: values.lastName,

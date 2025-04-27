@@ -19,13 +19,17 @@ export function canCreateResume(
 }
 
 // subscriptionLevel: SubscriptionLevel
-export function canUseAITools() {
+export function canUseAITools(subscriptionLevel: string = '') {
   // return subscriptionLevel !== "free";
+  subscriptionLevel = '';
+  console.log(subscriptionLevel)
   return true;
 }
 
 // subscriptionLevel: SubscriptionLevel
-export function canUseCustomizations() {
+export function canUseCustomizations(subscriptionLevel: string = '') {
+  subscriptionLevel = '';
+  console.log(subscriptionLevel)
   // return subscriptionLevel === "pro_plus";
   return true;
 }

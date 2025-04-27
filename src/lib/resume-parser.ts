@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ChatOpenAI } from '@langchain/openai';
 import { PromptTemplate } from '@langchain/core/prompts';
 import { LLMChain } from 'langchain/chains';
 import { z } from 'zod';
 
 // Schema for structured resume data
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ResumeDataSchema = z.object({
     personal: z.object({
         fullName: z.string(),
@@ -101,7 +103,7 @@ export class ATSResumeGenerator {
         const skillsStr = metadata['rms:rms_skill_0_keywords'] || '';
         const skills = [{
             category: 'Technical Skills',
-            keywords: skillsStr.split('\n').flatMap(line => line.split(', ')).filter(Boolean),
+            keywords: skillsStr.split('\n').flatMap((line: any) => line.split(', ')).filter(Boolean),
         }];
 
         // Extract certifications

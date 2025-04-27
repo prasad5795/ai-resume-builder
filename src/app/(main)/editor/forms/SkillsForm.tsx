@@ -26,7 +26,8 @@ export default function SkillsForm({
   });
 
   const onSubmit = (values: SkillsValues) => {
-    setResumeData(prevData => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setResumeData((prevData: any) => ({
       ...prevData,
       skills: values.skills
         ?.filter((skill) => skill !== undefined)

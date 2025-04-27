@@ -1,28 +1,21 @@
 "use client";
 
-import React, { useState } from 'react';
-import {
-    FileEdit,
-    PlusCircle,
-    RefreshCcw,
-    ArrowRight
-} from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogHeader,
     DialogTitle,
-    DialogDescription,
     DialogTrigger
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+    FileEdit,
+    PlusCircle
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
-
-interface ResumeCreationSelectorProps {
-    onStartFromScratch: () => void;
-    onModifyExisting: () => void;
-}
+import { useState } from 'react';
 
 export function ResumeCreationSelector() {
     const [isDialogOpen, setIsDialogOpen] = useState(false);

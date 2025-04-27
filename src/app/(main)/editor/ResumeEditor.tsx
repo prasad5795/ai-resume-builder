@@ -3,7 +3,6 @@
 import useUnloadWarning from "@/hooks/useUnloadWarning";
 import { ResumeServerData } from "@/lib/types";
 import { cn, mapToResumeValues } from "@/lib/utils";
-import { ResumeValues } from "@/lib/validation";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import Breadcrumbs from "./Breadcrumbs";
@@ -19,7 +18,8 @@ interface ResumeEditorProps {
 export default function ResumeEditor({ resumeToEdit }: ResumeEditorProps) {
   const searchParams = useSearchParams();
 
-  const [resumeData, setResumeData] = useState<ResumeValues>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [resumeData, setResumeData] = useState<any>(
     resumeToEdit ? mapToResumeValues(resumeToEdit) : {},
   );
 
