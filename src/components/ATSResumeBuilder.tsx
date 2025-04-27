@@ -23,7 +23,7 @@ export function ATSResumeBuilder({ parsedPDF, setatsResume }: ATSResumeBuilderPr
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    parsedPDF,
+                    parsedPDF: parsedPDF?.parsedData,
                     jobDescription,
                 }),
             });

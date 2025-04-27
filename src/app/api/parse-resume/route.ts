@@ -3,6 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { promises as fs } from "fs";
 import { v4 as uuidv4 } from "uuid";
 import PDFParser from "pdf2json";
+import { put } from "@vercel/blob";
+import path from "path";
+import os from "os";
 
 export async function POST(req: NextRequest) {
     const formData: FormData = await req.formData();
@@ -22,11 +25,28 @@ export async function POST(req: NextRequest) {
 
     try {
         const fileName = uuidv4();
-        const tempFilePath = `./${fileName}.pdf`;
+
+        // Use temp directory which is available in both local and serverless environments
+        const tempDir = process.env.VERCEL ? '/tmp' : os.tmpdir();
+        const tempFilePath = path.join(tempDir, `${fileName}.pdf`);
 
         // Convert file to buffer and save temporarily
         const fileBuffer = Buffer.from(await uploadedFile.arrayBuffer());
         await fs.writeFile(tempFilePath, fileBuffer);
+
+        // Optional: Upload to Vercel Blob for persistent storage
+        let blobUrl = null;
+        if (process.env.BLOB_READ_WRITE_TOKEN && process.env.NODE_ENV === 'production') {
+            try {
+                const blob = await put(`${fileName}.pdf`, fileBuffer, {
+                    access: 'public',
+                });
+                blobUrl = blob.url;
+            } catch (blobError) {
+                console.error('Error uploading to Vercel Blob:', blobError);
+                // Continue with PDF processing even if blob upload fails
+            }
+        }
 
         // Parse PDF
         const pdfParser = new (PDFParser as any)(null, 1);
@@ -47,10 +67,20 @@ export async function POST(req: NextRequest) {
         });
 
         // Clean up temp file
-        await fs.unlink(tempFilePath);
+        try {
+            await fs.unlink(tempFilePath);
+        } catch (unlinkError) {
+            console.error('Error deleting temp file:', unlinkError);
+            // Continue execution even if cleanup fails
+        }
 
-        // Return the parsed data
-        const response = new NextResponse(JSON.stringify(parsedData));
+        // Return the parsed data with optional blob URL
+        const responseData = {
+            parsedData,
+            blobUrl // Will be null if blob upload wasn't performed
+        };
+
+        const response = new NextResponse(JSON.stringify(responseData));
         response.headers.set("FileName", fileName);
         return response;
 
