@@ -11,7 +11,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { EditorFormProps } from "@/lib/types";
 import { skillsSchema, SkillsValues } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 export default function SkillsForm({
@@ -23,23 +22,18 @@ export default function SkillsForm({
     defaultValues: {
       skills: resumeData.skills || [],
     },
+    mode: 'onChange', // Validate on every change
   });
 
-  useEffect(() => {
-    const { unsubscribe } = form.watch(async (values) => {
-      const isValid = await form.trigger();
-      if (!isValid) return;
-      setResumeData({
-        ...resumeData,
-        skills:
-          values.skills
-            ?.filter((skill) => skill !== undefined)
-            .map((skill) => skill.trim())
-            .filter((skill) => skill !== "") || [],
-      });
-    });
-    return unsubscribe;
-  }, [form, resumeData, setResumeData]);
+  const onSubmit = (values: SkillsValues) => {
+    setResumeData(prevData => ({
+      ...prevData,
+      skills: values.skills
+        ?.filter((skill) => skill !== undefined)
+        .map((skill) => skill.trim())
+        .filter((skill) => skill !== "") || [],
+    }));
+  };
 
   return (
     <div className="mx-auto max-w-xl space-y-6">
@@ -48,7 +42,10 @@ export default function SkillsForm({
         <p className="text-sm text-muted-foreground">What are you good at?</p>
       </div>
       <Form {...form}>
-        <form className="space-y-3">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-3"
+        >
           <FormField
             control={form.control}
             name="skills"
@@ -59,9 +56,11 @@ export default function SkillsForm({
                   <Textarea
                     {...field}
                     placeholder="e.g. React.js, Node.js, graphic design, ..."
+                    value={field.value?.join(", ") || ""}
                     onChange={(e) => {
                       const skills = e.target.value.split(",");
                       field.onChange(skills);
+                      form.handleSubmit(onSubmit)();
                     }}
                   />
                 </FormControl>

@@ -11,7 +11,6 @@ import { Input } from "@/components/ui/input";
 import { EditorFormProps } from "@/lib/types";
 import { generalInfoSchema, GeneralInfoValues } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 export default function GeneralInfoForm({
@@ -24,16 +23,16 @@ export default function GeneralInfoForm({
       title: resumeData.title || "",
       description: resumeData.description || "",
     },
+    mode: 'onChange', // Validate on every change
   });
 
-  useEffect(() => {
-    const { unsubscribe } = form.watch(async (values) => {
-      const isValid = await form.trigger();
-      if (!isValid) return;
-      setResumeData({ ...resumeData, ...values });
-    });
-    return unsubscribe;
-  }, [form, resumeData, setResumeData]);
+  const onSubmit = (values: GeneralInfoValues) => {
+    setResumeData(prevData => ({
+      ...prevData,
+      title: values.title,
+      description: values.description
+    }));
+  };
 
   return (
     <div className="mx-auto max-w-xl space-y-6">
@@ -44,7 +43,10 @@ export default function GeneralInfoForm({
         </p>
       </div>
       <Form {...form}>
-        <form className="space-y-3">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-3"
+        >
           <FormField
             control={form.control}
             name="title"
@@ -52,7 +54,15 @@ export default function GeneralInfoForm({
               <FormItem>
                 <FormLabel>Project name</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="My cool resume" autoFocus />
+                  <Input
+                    {...field}
+                    placeholder="My cool resume"
+                    autoFocus
+                    onChange={(e) => {
+                      field.onChange(e);
+                      form.handleSubmit(onSubmit)();
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -65,7 +75,14 @@ export default function GeneralInfoForm({
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="A resume for my next job" />
+                  <Input
+                    {...field}
+                    placeholder="A resume for my next job"
+                    onChange={(e) => {
+                      field.onChange(e);
+                      form.handleSubmit(onSubmit)();
+                    }}
+                  />
                 </FormControl>
                 <FormDescription>
                   Describe what this resume is for.

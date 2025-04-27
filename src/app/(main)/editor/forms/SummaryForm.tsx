@@ -10,7 +10,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { EditorFormProps } from "@/lib/types";
 import { summarySchema, SummaryValues } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import GenerateSummaryButton from "./GenerateSummaryButton";
 
@@ -23,16 +22,15 @@ export default function SummaryForm({
     defaultValues: {
       summary: resumeData.summary || "",
     },
+    mode: 'onChange', // Validate on every change
   });
 
-  useEffect(() => {
-    const { unsubscribe } = form.watch(async (values) => {
-      const isValid = await form.trigger();
-      if (!isValid) return;
-      setResumeData({ ...resumeData, ...values });
-    });
-    return unsubscribe;
-  }, [form, resumeData, setResumeData]);
+  const onSubmit = (values: SummaryValues) => {
+    setResumeData(prevData => ({
+      ...prevData,
+      ...values
+    }));
+  };
 
   return (
     <div className="mx-auto max-w-xl space-y-6">
@@ -44,7 +42,10 @@ export default function SummaryForm({
         </p>
       </div>
       <Form {...form}>
-        <form className="space-y-3">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-3"
+        >
           <FormField
             control={form.control}
             name="summary"
@@ -55,14 +56,19 @@ export default function SummaryForm({
                   <Textarea
                     {...field}
                     placeholder="A brief, engaging text about yourself"
+                    onChange={(e) => {
+                      field.onChange(e);
+                      form.handleSubmit(onSubmit)();
+                    }}
                   />
                 </FormControl>
                 <FormMessage />
                 <GenerateSummaryButton
                   resumeData={resumeData}
-                  onSummaryGenerated={(summary) =>
-                    form.setValue("summary", summary)
-                  }
+                  onSummaryGenerated={(summary) => {
+                    form.setValue("summary", summary);
+                    form.handleSubmit(onSubmit)();
+                  }}
                 />
               </FormItem>
             )}

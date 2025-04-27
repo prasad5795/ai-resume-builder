@@ -33,7 +33,6 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { GripHorizontal } from "lucide-react";
-import { useEffect } from "react";
 import { useFieldArray, useForm, UseFormReturn } from "react-hook-form";
 import GenerateWorkExperienceButton from "./GenerateWorkExperienceButton";
 
@@ -46,20 +45,8 @@ export default function WorkExperienceForm({
     defaultValues: {
       workExperiences: resumeData.workExperiences || [],
     },
+    mode: 'onChange', // Validate on every change
   });
-
-  useEffect(() => {
-    const { unsubscribe } = form.watch(async (values) => {
-      const isValid = await form.trigger();
-      if (!isValid) return;
-      setResumeData({
-        ...resumeData,
-        workExperiences:
-          values.workExperiences?.filter((exp) => exp !== undefined) || [],
-      });
-    });
-    return unsubscribe;
-  }, [form, resumeData, setResumeData]);
 
   const { fields, append, remove, move } = useFieldArray({
     control: form.control,
@@ -73,6 +60,13 @@ export default function WorkExperienceForm({
     }),
   );
 
+  const onSubmit = (values: WorkExperienceValues) => {
+    setResumeData(prevData => ({
+      ...prevData,
+      workExperiences: values.workExperiences?.filter((exp) => exp !== undefined) || [],
+    }));
+  };
+
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
 
@@ -80,7 +74,10 @@ export default function WorkExperienceForm({
       const oldIndex = fields.findIndex((field) => field.id === active.id);
       const newIndex = fields.findIndex((field) => field.id === over.id);
       move(oldIndex, newIndex);
-      return arrayMove(fields, oldIndex, newIndex);
+      arrayMove(fields, oldIndex, newIndex);
+
+      // Trigger form submission after drag and drop
+      form.handleSubmit(onSubmit)();
     }
   }
 
@@ -93,7 +90,10 @@ export default function WorkExperienceForm({
         </p>
       </div>
       <Form {...form}>
-        <form className="space-y-3">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-3"
+        >
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
@@ -111,6 +111,7 @@ export default function WorkExperienceForm({
                   index={index}
                   form={form}
                   remove={remove}
+                  onSubmit={onSubmit}
                 />
               ))}
             </SortableContext>
@@ -118,15 +119,17 @@ export default function WorkExperienceForm({
           <div className="flex justify-center">
             <Button
               type="button"
-              onClick={() =>
+              onClick={() => {
                 append({
                   position: "",
                   company: "",
                   startDate: "",
                   endDate: "",
                   description: "",
-                })
-              }
+                });
+                // Trigger form submission after adding a new experience
+                form.handleSubmit(onSubmit)();
+              }}
             >
               Add work experience
             </Button>
@@ -142,6 +145,7 @@ interface WorkExperienceItemProps {
   form: UseFormReturn<WorkExperienceValues>;
   index: number;
   remove: (index: number) => void;
+  onSubmit: (values: WorkExperienceValues) => void;
 }
 
 function WorkExperienceItem({
@@ -149,6 +153,7 @@ function WorkExperienceItem({
   form,
   index,
   remove,
+  onSubmit,
 }: WorkExperienceItemProps) {
   const {
     attributes,
@@ -181,9 +186,10 @@ function WorkExperienceItem({
       </div>
       <div className="flex justify-center">
         <GenerateWorkExperienceButton
-          onWorkExperienceGenerated={(exp) =>
-            form.setValue(`workExperiences.${index}`, exp)
-          }
+          onWorkExperienceGenerated={(exp) => {
+            form.setValue(`workExperiences.${index}`, exp);
+            form.handleSubmit(onSubmit)();
+          }}
         />
       </div>
       <FormField
@@ -193,7 +199,14 @@ function WorkExperienceItem({
           <FormItem>
             <FormLabel>Job title</FormLabel>
             <FormControl>
-              <Input {...field} autoFocus />
+              <Input
+                {...field}
+                autoFocus
+                onChange={(e) => {
+                  field.onChange(e);
+                  form.handleSubmit(onSubmit)();
+                }}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -206,7 +219,13 @@ function WorkExperienceItem({
           <FormItem>
             <FormLabel>Company</FormLabel>
             <FormControl>
-              <Input {...field} />
+              <Input
+                {...field}
+                onChange={(e) => {
+                  field.onChange(e);
+                  form.handleSubmit(onSubmit)();
+                }}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -224,6 +243,10 @@ function WorkExperienceItem({
                   {...field}
                   type="date"
                   value={field.value?.slice(0, 10)}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    form.handleSubmit(onSubmit)();
+                  }}
                 />
               </FormControl>
               <FormMessage />
@@ -241,6 +264,10 @@ function WorkExperienceItem({
                   {...field}
                   type="date"
                   value={field.value?.slice(0, 10)}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    form.handleSubmit(onSubmit)();
+                  }}
                 />
               </FormControl>
               <FormMessage />
@@ -259,13 +286,26 @@ function WorkExperienceItem({
           <FormItem>
             <FormLabel>Description</FormLabel>
             <FormControl>
-              <Textarea {...field} />
+              <Textarea
+                {...field}
+                onChange={(e) => {
+                  field.onChange(e);
+                  form.handleSubmit(onSubmit)();
+                }}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
         )}
       />
-      <Button variant="destructive" type="button" onClick={() => remove(index)}>
+      <Button
+        variant="destructive"
+        type="button"
+        onClick={() => {
+          remove(index);
+          form.handleSubmit(onSubmit)();
+        }}
+      >
         Remove
       </Button>
     </div>

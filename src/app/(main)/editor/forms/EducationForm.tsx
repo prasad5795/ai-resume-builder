@@ -31,7 +31,6 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { GripHorizontal } from "lucide-react";
-import { useEffect } from "react";
 import { useFieldArray, useForm, UseFormReturn } from "react-hook-form";
 
 export default function EducationForm({
@@ -43,19 +42,8 @@ export default function EducationForm({
     defaultValues: {
       educations: resumeData.educations || [],
     },
+    mode: 'onChange', // Validate on every change
   });
-
-  useEffect(() => {
-    const { unsubscribe } = form.watch(async (values) => {
-      const isValid = await form.trigger();
-      if (!isValid) return;
-      setResumeData({
-        ...resumeData,
-        educations: values.educations?.filter((edu) => edu !== undefined) || [],
-      });
-    });
-    return unsubscribe;
-  }, [form, resumeData, setResumeData]);
 
   const { fields, append, remove, move } = useFieldArray({
     control: form.control,
@@ -69,6 +57,13 @@ export default function EducationForm({
     }),
   );
 
+  const onSubmit = (values: EducationValues) => {
+    setResumeData(prevData => ({
+      ...prevData,
+      educations: values.educations?.filter((edu) => edu !== undefined) || [],
+    }));
+  };
+
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
 
@@ -76,7 +71,10 @@ export default function EducationForm({
       const oldIndex = fields.findIndex((field) => field.id === active.id);
       const newIndex = fields.findIndex((field) => field.id === over.id);
       move(oldIndex, newIndex);
-      return arrayMove(fields, oldIndex, newIndex);
+      arrayMove(fields, oldIndex, newIndex);
+
+      // Trigger form submission after drag and drop
+      form.handleSubmit(onSubmit)();
     }
   }
 
@@ -89,7 +87,10 @@ export default function EducationForm({
         </p>
       </div>
       <Form {...form}>
-        <form className="space-y-3">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-3"
+        >
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
@@ -107,6 +108,7 @@ export default function EducationForm({
                   index={index}
                   form={form}
                   remove={remove}
+                  onSubmit={onSubmit}
                 />
               ))}
             </SortableContext>
@@ -114,14 +116,16 @@ export default function EducationForm({
           <div className="flex justify-center">
             <Button
               type="button"
-              onClick={() =>
+              onClick={() => {
                 append({
                   degree: "",
                   school: "",
                   startDate: "",
                   endDate: "",
-                })
-              }
+                });
+                // Trigger form submission after adding a new education
+                form.handleSubmit(onSubmit)();
+              }}
             >
               Add education
             </Button>
@@ -137,9 +141,16 @@ interface EducationItemProps {
   form: UseFormReturn<EducationValues>;
   index: number;
   remove: (index: number) => void;
+  onSubmit: (values: EducationValues) => void;
 }
 
-function EducationItem({ id, form, index, remove }: EducationItemProps) {
+function EducationItem({
+  id,
+  form,
+  index,
+  remove,
+  onSubmit
+}: EducationItemProps) {
   const {
     attributes,
     listeners,
@@ -176,7 +187,14 @@ function EducationItem({ id, form, index, remove }: EducationItemProps) {
           <FormItem>
             <FormLabel>Degree</FormLabel>
             <FormControl>
-              <Input {...field} autoFocus />
+              <Input
+                {...field}
+                autoFocus
+                onChange={(e) => {
+                  field.onChange(e);
+                  form.handleSubmit(onSubmit)();
+                }}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -189,7 +207,13 @@ function EducationItem({ id, form, index, remove }: EducationItemProps) {
           <FormItem>
             <FormLabel>School</FormLabel>
             <FormControl>
-              <Input {...field} />
+              <Input
+                {...field}
+                onChange={(e) => {
+                  field.onChange(e);
+                  form.handleSubmit(onSubmit)();
+                }}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -207,6 +231,10 @@ function EducationItem({ id, form, index, remove }: EducationItemProps) {
                   {...field}
                   type="date"
                   value={field.value?.slice(0, 10)}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    form.handleSubmit(onSubmit)();
+                  }}
                 />
               </FormControl>
               <FormMessage />
@@ -224,6 +252,10 @@ function EducationItem({ id, form, index, remove }: EducationItemProps) {
                   {...field}
                   type="date"
                   value={field.value?.slice(0, 10)}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    form.handleSubmit(onSubmit)();
+                  }}
                 />
               </FormControl>
               <FormMessage />
@@ -231,7 +263,14 @@ function EducationItem({ id, form, index, remove }: EducationItemProps) {
           )}
         />
       </div>
-      <Button variant="destructive" type="button" onClick={() => remove(index)}>
+      <Button
+        variant="destructive"
+        type="button"
+        onClick={() => {
+          remove(index);
+          form.handleSubmit(onSubmit)();
+        }}
+      >
         Remove
       </Button>
     </div>

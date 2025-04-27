@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { EditorFormProps } from "@/lib/types";
 import { personalInfoSchema, PersonalInfoValues } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { useForm } from "react-hook-form";
 
 export default function PersonalInfoForm({
@@ -28,19 +28,26 @@ export default function PersonalInfoForm({
       country: resumeData.country || "",
       phone: resumeData.phone || "",
       email: resumeData.email || "",
+      photo: resumeData.photo || null,
     },
+    mode: 'onChange', // Validate on every change
   });
 
-  useEffect(() => {
-    const { unsubscribe } = form.watch(async (values) => {
-      const isValid = await form.trigger();
-      if (!isValid) return;
-      setResumeData({ ...resumeData, ...values });
-    });
-    return unsubscribe;
-  }, [form, resumeData, setResumeData]);
-
   const photoInputRef = useRef<HTMLInputElement>(null);
+
+  const onSubmit = (values: PersonalInfoValues) => {
+    setResumeData(prevData => ({
+      ...prevData,
+      firstName: values.firstName,
+      lastName: values.lastName,
+      jobTitle: values.jobTitle,
+      city: values.city,
+      country: values.country,
+      phone: values.phone,
+      email: values.email,
+      photo: values.photo,
+    }));
+  };
 
   return (
     <div className="mx-auto max-w-xl space-y-6">
@@ -49,7 +56,10 @@ export default function PersonalInfoForm({
         <p className="text-sm text-muted-foreground">Tell us about yourself.</p>
       </div>
       <Form {...form}>
-        <form className="space-y-3">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-3"
+        >
           <FormField
             control={form.control}
             name="photo"
@@ -65,6 +75,7 @@ export default function PersonalInfoForm({
                       onChange={(e) => {
                         const file = e.target.files?.[0];
                         fieldValues.onChange(file);
+                        form.handleSubmit(onSubmit)();
                       }}
                       ref={photoInputRef}
                     />
@@ -77,6 +88,7 @@ export default function PersonalInfoForm({
                       if (photoInputRef.current) {
                         photoInputRef.current.value = "";
                       }
+                      form.handleSubmit(onSubmit)();
                     }}
                   >
                     Remove
@@ -94,7 +106,13 @@ export default function PersonalInfoForm({
                 <FormItem>
                   <FormLabel>First name</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input
+                      {...field}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        form.handleSubmit(onSubmit)();
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -107,7 +125,13 @@ export default function PersonalInfoForm({
                 <FormItem>
                   <FormLabel>Last name</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input
+                      {...field}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        form.handleSubmit(onSubmit)();
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -121,7 +145,13 @@ export default function PersonalInfoForm({
               <FormItem>
                 <FormLabel>Job title</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input
+                    {...field}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      form.handleSubmit(onSubmit)();
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -135,7 +165,13 @@ export default function PersonalInfoForm({
                 <FormItem>
                   <FormLabel>City</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input
+                      {...field}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        form.handleSubmit(onSubmit)();
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -148,7 +184,13 @@ export default function PersonalInfoForm({
                 <FormItem>
                   <FormLabel>Country</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input
+                      {...field}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        form.handleSubmit(onSubmit)();
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -162,7 +204,14 @@ export default function PersonalInfoForm({
               <FormItem>
                 <FormLabel>Phone</FormLabel>
                 <FormControl>
-                  <Input {...field} type="tel" />
+                  <Input
+                    {...field}
+                    type="tel"
+                    onChange={(e) => {
+                      field.onChange(e);
+                      form.handleSubmit(onSubmit)();
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -175,7 +224,14 @@ export default function PersonalInfoForm({
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input {...field} type="email" />
+                  <Input
+                    {...field}
+                    type="email"
+                    onChange={(e) => {
+                      field.onChange(e);
+                      form.handleSubmit(onSubmit)();
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
