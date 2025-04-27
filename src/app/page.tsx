@@ -3,6 +3,7 @@ import resumePreview from "@/assets/hero_job_title.svg";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
+import { ResumeCreationSelector } from "./selection/ResumeCreationSelector";
 
 export default function Home() {
   return (
@@ -26,9 +27,8 @@ export default function Home() {
           Our <span className="font-bold">AI resume builder</span> helps you
           design a professional resume, even if you&apos;re not very smart.
         </p>
-        <Button asChild size="lg" variant="premium">
-          <Link href="/resumes">Get started</Link>
-        </Button>
+
+        <ResumeCreationSelector />
       </div>
       <div>
         <Image

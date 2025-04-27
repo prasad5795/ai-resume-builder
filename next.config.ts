@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
         hostname: "w0mlmrgwbziwquaq.public.blob.vercel-storage.com"
       }
     ]
-  }
+  },
 };
 
 export default nextConfig;
