@@ -51,8 +51,8 @@ export class ATSResumeGenerator {
     constructor(openAIApiKey: string) {
         this.llm = new ChatOpenAI({
             openAIApiKey,
-            modelName: 'gpt-4o', // or 'gpt-3.5-turbo' for cheaper option
-            temperature: 0.3,
+            modelName: 'gpt-3.5-turbo', // or 'gpt-3.5-turbo' for cheaper option
+            temperature: 0.7,
         });
     }
 
