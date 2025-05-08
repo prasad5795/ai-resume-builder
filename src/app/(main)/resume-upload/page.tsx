@@ -6,24 +6,23 @@ import { PDFUpload } from '@/components/PDFUpload';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { useState } from 'react';
+import { FilePondFile } from 'filepond';
 
 export default function ResumeUploadPage() {
-    const [isProcessing, setIsProcessing] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [parsedPDF, setparsedPDF] = useState(null)
     const [, setfileName] = useState<string | null>(null)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [atsResume, setatsResume] = useState<any>()
 
-    const handleFileSelect = async (file: File | null) => {
-        if (file) {
-            setIsProcessing(true);
+    const handleFileSelect = async (file: FilePondFile | null) => {
+        if (file && file?.file) {
             setError(null);
 
-            setfileName(file?.name)
+            setfileName(file?.filename)
 
             const formData = new FormData();
-            formData.append('file', file);
+            formData.append('file', file?.file);
 
             try {
                 const response = await fetch('/api/parse-resume', {
@@ -40,8 +39,6 @@ export default function ResumeUploadPage() {
             } catch (error) {
                 console.error('Error uploading resume:', error);
                 setError(error instanceof Error ? error.message : 'Failed to upload resume');
-            } finally {
-                setIsProcessing(false);
             }
         }
     };
@@ -59,7 +56,6 @@ export default function ResumeUploadPage() {
                 >
                     <PDFUpload
                         onFileSelect={handleFileSelect}
-                        isProcessing={isProcessing}
                         setatsResume={setatsResume}
                     />
 
