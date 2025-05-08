@@ -3,6 +3,7 @@ import { ChatOpenAI } from '@langchain/openai';
 import { PromptTemplate } from '@langchain/core/prompts';
 import { LLMChain } from 'langchain/chains';
 import { z } from 'zod';
+import { StringOutputParser } from '@langchain/core/output_parsers';
 
 // Schema for structured resume data
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -51,8 +52,10 @@ export class ATSResumeGenerator {
     constructor(openAIApiKey: string) {
         this.llm = new ChatOpenAI({
             openAIApiKey,
-            modelName: 'gpt-3.5-turbo', // or 'gpt-3.5-turbo' for cheaper option
+            modelName: 'gpt-4o', // or 'gpt-3.5-turbo' for cheaper option
             temperature: 0.7,
+            streaming: true,
+            verbose: true,
         });
     }
 
@@ -144,7 +147,7 @@ export class ATSResumeGenerator {
     }
 
     // Generate ATS-friendly resume based on job description
-    async generateATSResume(resumeData: ResumeData, jobDescription: string): Promise<string> {
+    async generateATSResume(resumeData: ResumeData, jobDescription: string) {
         const prompt = PromptTemplate.fromTemplate(`
         You are an expert ATS (Applicant Tracking System) resume optimizer. Generate an ATS-friendly resume by:
         1. Tailoring the content to match the job description's keywords
@@ -176,15 +179,18 @@ export class ATSResumeGenerator {
         - Ensure all dates are in standard format
         `);
 
-        const chain = new LLMChain({ llm: this.llm, prompt });
+        const parser = new StringOutputParser();
 
-        const result = await chain.call({
+        const chain = prompt.pipe(this.llm).pipe(parser)
+
+        // const chain = new LLMChain({ llm: this.llm, prompt });
+
+        const stream = await chain.stream({
             resumeJSON: JSON.stringify(resumeData, null, 2),
             jobDescription,
         });
 
-        // Optional: Remove any potential code block markers if they persist
-        return result.text.replace(/```markdown\n?|\n?```/g, '').trim();
+        return stream;
     }
 
     // Analyze keyword match between resume and job description

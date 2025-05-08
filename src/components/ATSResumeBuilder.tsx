@@ -16,6 +16,7 @@ export function ATSResumeBuilder({ parsedPDF, setatsResume }: ATSResumeBuilderPr
 
     const handleGenerate = async () => {
         setLoading(true);
+        setatsResume(undefined)
         try {
             const response = await fetch('/api/generate-ats-resume', {
                 method: 'POST',
@@ -28,8 +29,31 @@ export function ATSResumeBuilder({ parsedPDF, setatsResume }: ATSResumeBuilderPr
                 }),
             });
 
-            const data = await response.json();
-            setatsResume(data)
+            const reader = response.body?.getReader()
+            if (!reader) return
+
+            const decoder = new TextDecoder('utf-8')
+
+            while (true) {
+                const { done, value } = await reader.read()
+                if (done) break
+
+                // Update answer incrementally
+                const chunk = decoder.decode(value)
+                setatsResume((prev: string) => {
+                    if (chunk) {
+                        if (prev) {
+                            prev += chunk
+                            return prev;
+                        }
+                        else {
+                            return chunk;
+                        }
+                    }
+                })
+
+            }
+
         } catch (error) {
             console.error('Error generating ATS resume:', error);
         } finally {

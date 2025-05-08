@@ -18,16 +18,20 @@ export async function POST(req: NextRequest) {
         const resumeData = generator.extractResumeData(parsedPDF);
 
         // Generate ATS-friendly resume
-        const atsResume = await generator.generateATSResume(resumeData, jobDescription);
+        const stream = await generator.generateATSResume(resumeData, jobDescription);
 
         // Analyze keyword match
         // const keywordAnalysis = await generator.analyzeKeywordMatch(resumeData, jobDescription);
 
-        return NextResponse.json({
-            resumeData,
-            atsResume,
-            // keywordAnalysis,
-        });
+        return new NextResponse(stream, {
+            headers: {
+                'Content-Type': 'text/event-stream',
+                'Cache-Control': 'no-cache',
+                'Connection': 'keep-alive',
+                'Transfer-Encoding': 'chunked'
+            },
+            status: 200
+        })
 
         // return NextResponse.json({
         //     "resumeData": {

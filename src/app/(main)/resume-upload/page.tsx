@@ -81,13 +81,13 @@ export default function ResumeUploadPage() {
                             <CardHeader><h2></h2></CardHeader>
                             <CardContent className='overflow-y-auto'>
                                 <div className="prose max-w-full max-h-full">
-                                    <ATSResumeShowcase resumeContent={atsResume?.atsResume} />
+                                    <ATSResumeShowcase resumeContent={atsResume} />
                                 </div>
                             </CardContent>
                         </Card>
                         <Button
                             onClick={() => {
-                                const blob = new Blob([atsResume?.atsResume], { type: 'text/markdown' });
+                                const blob = new Blob([atsResume], { type: 'text/markdown' });
                                 const url = URL.createObjectURL(blob);
                                 const a = document.createElement('a');
                                 a.href = url;
